@@ -14,8 +14,8 @@ namespace scheduler.Controllers
 {
     public class AccountController : Controller
     {
-        private UserContext db;
-        public AccountController(UserContext context)
+        private ApplicationContext db;
+        public AccountController(ApplicationContext context)
         {
             this.db = context;
         }
@@ -37,7 +37,7 @@ namespace scheduler.Controllers
                 {
                     await Authenticate(model.Nickname); // аутентификация
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Create", "Event");
                 }
                 ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             }
@@ -65,7 +65,7 @@ namespace scheduler.Controllers
 
                     await Authenticate(model.Nickname); // аутентификация
 
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Create", "Event");
                 }
                 else
                     ModelState.AddModelError("", "Некорректные логин и(или) пароль");

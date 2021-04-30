@@ -1,8 +1,28 @@
-﻿@{
+﻿@model IEnumerable<scheduler.Models.Event> 
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
+    <h1 class="display-4">Доступные события</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+
+    @foreach (var el in Model)
+    {
+        <div class="card mb-3">
+            <div class="card-body">
+                <div class="media">
+                    <div class="media-body">
+                        <h5 class="card-title">@el.Title</h5>
+                        <p>@el.EventDate</p>
+                        <p>@el.BeginTime - @el.EndTime</p>
+                        <a href="#" class="btn btn-primary">Read more...</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+
 </div>

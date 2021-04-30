@@ -12,17 +12,21 @@ namespace scheduler.Controllers
 {
     public class HomeController : Controller
     {
+        private ApplicationContext db;
+        private static List<Event> events = new List<Event>();
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ApplicationContext db)
         {
             _logger = logger;
+            this.db = db;
+            events = db.Events.ToList();
         }
 
         [Authorize]
         public IActionResult Index()
         {
-            return Content(User.Identity.Name);
+            return View(events);
         }
 
         public IActionResult Privacy()
