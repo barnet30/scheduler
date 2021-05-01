@@ -12,15 +12,14 @@ namespace scheduler.Models
         public string Title { get; set; }
         public int UserId { get; set; }
 
-        public DateTime EventDate { get; set; }
 
         [Required]
-        [DataType(DataType.Time)]
-        public DateTime BeginTime { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime BeginDate { get; set; }
 
         [Required]
-        [DataType(DataType.Time)]
-        public DateTime EndTime { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime EndDate { get; set; }
 
 
         public virtual User User { get; set; }

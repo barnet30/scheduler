@@ -18,7 +18,16 @@ namespace scheduler.Controllers
         {
             this.db = context;
         }
-           
+         
+        
+        [HttpGet]
+        public IActionResult Info(int id)
+        {
+            Event model = db.Events.FirstOrDefault(el => el.Id == id);
+            ViewData["Nick"] = db.Users.FirstOrDefault(c => c.Id == model.UserId).Nickname;
+            return View(model);
+        }
+
         [HttpGet]
         public IActionResult Create()
         {
@@ -33,10 +42,19 @@ namespace scheduler.Controllers
                 User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);
                 if (user != null)
                 {
-                    db.Add(new Event { Title = model.Title, UserId = user.Id, EventDate = model.EventDate, BeginTime = model.BeginTime, EndTime = model.EndTime });
-                    await db.SaveChangesAsync();
+                    if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
+                    {
+                        db.Add(new Event { Title = model.Title, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                        await db.SaveChangesAsync();
+
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "Неврно заполнена дата проведения");
+                        return View();
+                    }
                     
-                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {

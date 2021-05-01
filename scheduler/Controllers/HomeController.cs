@@ -13,7 +13,7 @@ namespace scheduler.Controllers
     public class HomeController : Controller
     {
         private ApplicationContext db;
-        private static List<Event> events = new List<Event>();
+        private static List<Event> events;
         private readonly ILogger<HomeController> _logger;
 
         public HomeController(ILogger<HomeController> logger, ApplicationContext db)
@@ -26,9 +26,11 @@ namespace scheduler.Controllers
         [Authorize]
         public IActionResult Index()
         {
+
             return View(events);
         }
 
+        
         public IActionResult Privacy()
         {
             return View();

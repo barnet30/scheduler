@@ -1,0 +1,34 @@
+﻿@model scheduler.Models.Event
+
+
+<h2>Событие @Model.Title</h2>
+
+
+<form asp-action="Info" asp-controller="Event" asp-anti-forgery="true" method="get">
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div>
+        <div class="form-group">
+            <label asp-for="User.Nickname">Никнейм создателя: @ViewData["Nick"] </label>
+            @*<input type="text" asp-for="Nickname" />
+            <span asp-validation-for="Nickname" />*@
+        </div>
+        <div class="form-group">
+            <label asp-for="BeginDate">Дата начала</label>
+            <time>@Model.BeginDate</time>
+            @*<input type="datetime-local" asp-for="BeginDate" />
+            <span asp-validation-for="BeginDate" />*@
+        </div>
+        <div class="form-group">
+            <label asp-for="EndDate">Дата конца</label>
+            <time>@Model.EndDate</time>
+            @*<input type="datetime-local" asp-for="EndDate" value="" />
+            <span asp-validation-for="EndDate" />*@
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Записаться" class="btn btn-outline-dark" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Изменить" class="btn btn-outline-dark" />
+        </div>
+    </div>
+</form>

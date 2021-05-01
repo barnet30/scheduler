@@ -14,16 +14,12 @@ namespace scheduler.ViewModels
         public string Nickname { get; set; }
 
         [Required]
-        [DataType(DataType.Date)]
-        public DateTime EventDate { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime BeginDate { get; set; }
 
         [Required]
-        [DataType(DataType.Time)]
-        public DateTime BeginTime { get; set; }
-
-        [Required]
-        [DataType(DataType.Time)]
-        public DateTime EndTime { get; set; }
+        [DataType(DataType.DateTime)]
+        public DateTime EndDate { get; set; }
 
     }
 }

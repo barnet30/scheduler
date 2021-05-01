@@ -16,9 +16,8 @@
                 <div class="media">
                     <div class="media-body">
                         <h5 class="card-title">@el.Title</h5>
-                        <p>@el.EventDate</p>
-                        <p>@el.BeginTime - @el.EndTime</p>
-                        <a href="#" class="btn btn-primary">Read more...</a>
+                        <p>@el.BeginDate - @el.EndDate</p>
+                        <a asp-action="Info" asp-route-id="@el.Id" asp-controller="Event" class="btn btn-primary">Read more...</a>
                     </div>
                 </div>
             </div>
