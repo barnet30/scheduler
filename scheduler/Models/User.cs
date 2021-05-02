@@ -12,5 +12,6 @@ namespace scheduler.Models
         public string Password { get; set; }
 
         public List<Event> Events { get; set; }
+        public List<DateEvent> DateEvents { get; set; }
     }
 }

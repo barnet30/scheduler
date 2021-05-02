@@ -1,0 +1,39 @@
+﻿@model scheduler.ViewModels.DateEventModel
+
+<h2>Записаться на событие</h2>
+
+
+<form asp-action="Subscribe" asp-controller="DateEvent" asp-anti-forgery="true" method="post">
+    <div class="validation" asp-validation-summary="ModelOnly"></div>
+    <div>
+        @*<div class="form-group">
+            <label >Название @ViewBag.Name</label>
+        </div>*@
+        <select size="1">
+            <option disabled>Выберите событие</option>
+            @foreach(var el in Model.Events)
+            {
+                <option>@el.Title</option>
+            }
+        </select>
+
+        <div class="form-group">
+            <label asp-for="Nickname">Введите Ваш Никнейм:</label>
+            <input type="text" asp-for="Nickname" />
+            <span asp-validation-for="Nickname" />
+        </div>
+        <div class="form-group">
+            <label asp-for="BeginDate">Введите дату начала проведения</label>
+            <input type="datetime-local" asp-for="BeginDate" />
+            <span asp-validation-for="BeginDate" />
+        </div>
+        <div class="form-group">
+            <label asp-for="EndDate">Введите дату конца</label>
+            <input type="datetime-local" asp-for="EndDate" />
+            <span asp-validation-for="EndDate" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Записаться" asp-route-id="@ViewBag.id" class="btn btn-outline-dark"  />
+        </div>
+    </div>
+</form> 

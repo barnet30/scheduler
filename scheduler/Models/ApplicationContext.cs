@@ -10,6 +10,7 @@ namespace scheduler.Models
     {
         public DbSet<User> Users { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<DateEvent> DateEvents { get; set; }
         public ApplicationContext(DbContextOptions<ApplicationContext> options)
             : base(options)
         {

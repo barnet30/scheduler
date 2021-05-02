@@ -24,7 +24,7 @@ namespace scheduler.Controllers
         public IActionResult Info(int id)
         {
             Event model = db.Events.FirstOrDefault(el => el.Id == id);
-            ViewData["Nick"] = db.Users.FirstOrDefault(c => c.Id == model.UserId).Nickname;
+            ViewData["Nick"] = db.Users.FirstOrDefault(c => c.Id == model.CreaterUserId).Nickname;
             return View(model);
         }
 
@@ -44,7 +44,11 @@ namespace scheduler.Controllers
                 {
                     if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
                     {
-                        db.Add(new Event { Title = model.Title, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                        db.Events.Add(new Event { Title = model.Title, CreaterUserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                        await db.SaveChangesAsync();
+
+                        Event newEv = await db.Events.OrderBy(i=>i.Id).LastOrDefaultAsync(u => u.CreaterUserId == user.Id);
+                        db.DateEvents.Add(new DateEvent { EventId = newEv.Id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
                         await db.SaveChangesAsync();
 
                         return RedirectToAction("Index", "Home");

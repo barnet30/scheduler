@@ -1,13 +1,17 @@
-﻿using System;
+﻿using scheduler.Models;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace scheduler.ViewModels
 {
-    public class EventModel
-    { 
-        [StringLength(60, MinimumLength = 3)]
+    public class DateEventModel
+    {
+        /*[StringLength(60, MinimumLength = 3)]
         [Required(ErrorMessage = "Неверно указано название")]
-        public string Title{ get; set; }
+        public string Title { get; set; }*/
+
+        public IEnumerable<Event> Events { get; set; }
 
         [StringLength(60, MinimumLength = 3)]
         [Required(ErrorMessage = "Неверно указан NICKNAME")]
