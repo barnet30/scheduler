@@ -37,6 +37,7 @@ namespace scheduler.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(EventModel model)
         {
+
             if (ModelState.IsValid)
             {
                 User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);

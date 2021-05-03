@@ -7,11 +7,8 @@ namespace scheduler.ViewModels
 {
     public class DateEventModel
     {
-        /*[StringLength(60, MinimumLength = 3)]
-        [Required(ErrorMessage = "Неверно указано название")]
-        public string Title { get; set; }*/
-
         public IEnumerable<Event> Events { get; set; }
+        public string SelectedEvent { get; set; }
 
         [StringLength(60, MinimumLength = 3)]
         [Required(ErrorMessage = "Неверно указан NICKNAME")]

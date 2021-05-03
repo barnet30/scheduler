@@ -13,77 +13,83 @@ namespace scheduler.Controllers
     public class DateEventController : Controller
     {
         private ApplicationContext db;
-        private static List<int> allUsersId;
         public DateEventController(ApplicationContext context)
         {
             db = context;
-            allUsersId = db.DateEvents.Select(u => u.UserId).ToList() ;
+            //allUsersId = db.DateEvents.Select(u => u.UserId).Where().ToList() ;
         }
-
-
-        public IEnumerable<Event> AllEvents => db.Events;
 
         [HttpGet]
         public IActionResult Subscribe(int id)
         {
             Event tmpEv = db.Events.FirstOrDefault(el => el.Id == id);
-            //ViewData["EventName"] = tmpEv.Title;
-            //DateEvent de = db.DateEvents.Include(u => u.Event).FirstOrDefault(de => de.Event.Id == id);
-            //ViewBag.Name = tmpEv.Title;
-
             DateEventModel model = new DateEventModel
             {
-                Events = AllEvents
+                Events = db.Events,
+                SelectedEvent = tmpEv.Title,
+                BeginDate = tmpEv.BeginDate,
+                EndDate = tmpEv.EndDate
             };
             return View(model);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Subscribe(DateEventModel model, int id)
+        public async Task<IActionResult> Subscribe(DateEventModel model, string SelectedEvent)
         {
+            DateEventModel errModel = new DateEventModel
+            {
+                Events = db.Events,
+                SelectedEvent = SelectedEvent,
+                BeginDate = model.BeginDate,
+                EndDate = model.EndDate
+            };
 
-
-            //ViewBag.id = id;
             if (ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);
-                //Event ev = await db.Events.FirstOrDefaultAsync(u => u.Id == id);
+                User user = db.Users.FirstOrDefault(u => u.Nickname == model.Nickname);
                 if (user != null)
                 {
-                    bool check = (allUsersId.Contains(user.Id));
-                    if (!check)
+                    //bool check = (allUsersId.Contains(user.Id));
+                    Event ev = db.Events.FirstOrDefault(u => u.Title == SelectedEvent);
+                    if (ev != null) 
                     {
-                        if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
+                        var userId = db.DateEvents.FirstOrDefault(u => u.UserId == user.Id && u.EventId == ev.Id);
+                        if (userId == null)
                         {
-                            db.DateEvents.Add(new DateEvent { EventId = id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
-                            await db.SaveChangesAsync();
+                            if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
+                            {
+                                db.DateEvents.Add(new DateEvent { EventId = ev.Id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                                await db.SaveChangesAsync();
 
-                            return RedirectToAction("Index", "Home");
+                                return RedirectToAction("Index", "Home");
+                            }
+                            else
+                            {
+                                ModelState.AddModelError("", "Неврно заполнена дата проведения");
+                                return View(errModel);
+                            }
                         }
                         else
                         {
-                            ModelState.AddModelError("", "Неврно заполнена дата проведения");
-                            return View();
+                            ModelState.AddModelError("", "Такой пользователь уже записался на событие");
+                            return View(errModel);
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Такой пользователь уже записался на событие");
-                        return View();
+                        ModelState.AddModelError("", "Такого события не существует");
+                        return View(errModel);
                     }
-
-
                 }
                 else
                 {
                     ModelState.AddModelError("", "Такого пользователя не существует!");
-                    return View(model);
+                    return View(errModel);
                 }
             }
             else
                 ModelState.AddModelError("", "Некоректные данные");
-                
-            return View(model);
+            return View(errModel);
         }
     }
 }

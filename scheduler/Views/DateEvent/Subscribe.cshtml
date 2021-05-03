@@ -6,17 +6,20 @@
 <form asp-action="Subscribe" asp-controller="DateEvent" asp-anti-forgery="true" method="post">
     <div class="validation" asp-validation-summary="ModelOnly"></div>
     <div>
-        @*<div class="form-group">
-            <label >Название @ViewBag.Name</label>
-        </div>*@
-        <select size="1">
-            <option disabled>Выберите событие</option>
-            @foreach(var el in Model.Events)
+        <label asp-for="SelectedEvent">Выберите Событие:</label>
+        <select name="SelectedEvent" size="1" >
+            @foreach (var el in Model.Events)
             {
-                <option>@el.Title</option>
+                if (el.Title == Model.SelectedEvent)
+                {
+                    <option selected="selected">@el.Title</option>
+                }
+                else
+                {
+                    <option >@el.Title</option>
+                }
             }
         </select>
-
         <div class="form-group">
             <label asp-for="Nickname">Введите Ваш Никнейм:</label>
             <input type="text" asp-for="Nickname" />
@@ -33,7 +36,7 @@
             <span asp-validation-for="EndDate" />
         </div>
         <div class="form-group">
-            <input type="submit" value="Записаться" asp-route-id="@ViewBag.id" class="btn btn-outline-dark"  />
+            <input type="submit" value="Записаться" class="btn btn-outline-dark"  />
         </div>
     </div>
 </form> 
