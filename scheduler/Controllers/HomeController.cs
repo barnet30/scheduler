@@ -26,13 +26,14 @@ namespace scheduler.Controllers
         [Authorize]
         public IActionResult Index()
         {
-
+            ViewData["Username"] = HttpContext.User.Identity.Name;
             return View(events);
         }
 
         
         public IActionResult Privacy()
         {
+            ViewData["Username"] = HttpContext.User.Identity.Name;
             return View();
         }
 

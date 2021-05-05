@@ -22,7 +22,7 @@
             <a type="submit" value="Записаться" class="btn btn-outline-dark" asp-controller="DateEvent" asp-action="Subscribe" asp-route-id="@Model.Id">Записаться</a>
         </div>
         <div class="form-group">
-            <input type="submit" value="Изменить" class="btn btn-outline-dark" />
+            <input asp-controller="Event" asp-action="Calculate" asp-route-id="@Model.Id" type="submit" value="Подсчитать" class="btn btn-outline-dark" />
         </div>
     </div>
 </form>

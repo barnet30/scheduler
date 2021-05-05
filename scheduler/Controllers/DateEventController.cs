@@ -22,20 +22,30 @@ namespace scheduler.Controllers
         [HttpGet]
         public IActionResult Subscribe(int id)
         {
+            ViewData["Username"] = HttpContext.User.Identity.Name;
             Event tmpEv = db.Events.FirstOrDefault(el => el.Id == id);
-            DateEventModel model = new DateEventModel
+            if (tmpEv != null) 
             {
-                Events = db.Events,
-                SelectedEvent = tmpEv.Title,
-                BeginDate = tmpEv.BeginDate,
-                EndDate = tmpEv.EndDate
-            };
-            return View(model);
+                DateEventModel model = new DateEventModel
+                {
+                    Events = db.Events,
+                    SelectedEvent = tmpEv.Title,
+                    BeginDate = tmpEv.BeginDate,
+                    EndDate = tmpEv.EndDate
+                };
+                return View(model);
+            }
+            else
+            {
+                return RedirectToAction("Error", "Home");
+            }
+            
         }
 
         [HttpPost]
         public async Task<IActionResult> Subscribe(DateEventModel model, string SelectedEvent)
         {
+            ViewData["Username"] = HttpContext.User.Identity.Name;
             DateEventModel errModel = new DateEventModel
             {
                 Events = db.Events,
