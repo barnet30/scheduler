@@ -23,83 +23,98 @@ namespace scheduler.Controllers
         public IActionResult Subscribe(int id)
         {
             ViewData["Username"] = HttpContext.User.Identity.Name;
-            Event tmpEv = db.Events.FirstOrDefault(el => el.Id == id);
-            if (tmpEv != null) 
+            if (HttpContext.User.Identity.Name != null)
             {
-                DateEventModel model = new DateEventModel
+                Event tmpEv = db.Events.FirstOrDefault(el => el.Id == id);
+                if (tmpEv != null)
                 {
-                    Events = db.Events,
-                    SelectedEvent = tmpEv.Title,
-                    BeginDate = tmpEv.BeginDate,
-                    EndDate = tmpEv.EndDate
-                };
-                return View(model);
+                    DateEventModel model = new DateEventModel
+                    {
+                        Events = db.Events,
+                        SelectedEvent = tmpEv.Title,
+                        BeginDate = tmpEv.BeginDate,
+                        EndDate = tmpEv.EndDate
+                    };
+                    return View(model);
+                }
+                else
+                {
+                    return RedirectToAction("Error", "Home");
+                }
             }
             else
             {
-                return RedirectToAction("Error", "Home");
+                return RedirectToAction("Login", "Account");
             }
-            
+                        
         }
 
         [HttpPost]
         public async Task<IActionResult> Subscribe(DateEventModel model, string SelectedEvent)
         {
             ViewData["Username"] = HttpContext.User.Identity.Name;
-            DateEventModel errModel = new DateEventModel
+            if (HttpContext.User.Identity.Name != null)
             {
-                Events = db.Events,
-                SelectedEvent = SelectedEvent,
-                BeginDate = model.BeginDate,
-                EndDate = model.EndDate
-            };
-
-            if (ModelState.IsValid)
-            {
-                User user = db.Users.FirstOrDefault(u => u.Nickname == model.Nickname);
-                if (user != null)
+                DateEventModel errModel = new DateEventModel
                 {
-                    //bool check = (allUsersId.Contains(user.Id));
-                    Event ev = db.Events.FirstOrDefault(u => u.Title == SelectedEvent);
-                    if (ev != null) 
-                    {
-                        var userId = db.DateEvents.FirstOrDefault(u => u.UserId == user.Id && u.EventId == ev.Id);
-                        if (userId == null)
-                        {
-                            if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
-                            {
-                                db.DateEvents.Add(new DateEvent { EventId = ev.Id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
-                                await db.SaveChangesAsync();
+                    Events = db.Events,
+                    SelectedEvent = SelectedEvent,
+                    BeginDate = model.BeginDate,
+                    EndDate = model.EndDate
+                };
 
-                                return RedirectToAction("Index", "Home");
+                if (ModelState.IsValid)
+                {
+                    User user = db.Users.FirstOrDefault(u => u.Nickname == model.Nickname);
+                    if (user != null)
+                    {
+                        //bool check = (allUsersId.Contains(user.Id));
+                        Event ev = db.Events.FirstOrDefault(u => u.Title == SelectedEvent);
+                        if (ev != null)
+                        {
+                            var userId = db.DateEvents.FirstOrDefault(u => u.UserId == user.Id && u.EventId == ev.Id);
+                            if (userId == null)
+                            {
+                                if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
+                                {
+                                    db.DateEvents.Add(new DateEvent { EventId = ev.Id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                                    await db.SaveChangesAsync();
+
+                                    return RedirectToAction("Index", "Home");
+                                }
+                                else
+                                {
+                                    ModelState.AddModelError("", "Неврно заполнена дата проведения");
+                                    return View(errModel);
+                                }
                             }
                             else
                             {
-                                ModelState.AddModelError("", "Неврно заполнена дата проведения");
+                                ModelState.AddModelError("", "Такой пользователь уже записался на событие");
                                 return View(errModel);
                             }
                         }
                         else
                         {
-                            ModelState.AddModelError("", "Такой пользователь уже записался на событие");
+                            ModelState.AddModelError("", "Такого события не существует");
                             return View(errModel);
                         }
                     }
                     else
                     {
-                        ModelState.AddModelError("", "Такого события не существует");
+                        ModelState.AddModelError("", "Такого пользователя не существует!");
                         return View(errModel);
                     }
                 }
                 else
-                {
-                    ModelState.AddModelError("", "Такого пользователя не существует!");
-                    return View(errModel);
-                }
+                    ModelState.AddModelError("", "Некоректные данные");
+                return View(errModel);
             }
             else
-                ModelState.AddModelError("", "Некоректные данные");
-            return View(errModel);
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            
         }
     }
 }

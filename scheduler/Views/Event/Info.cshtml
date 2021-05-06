@@ -1,7 +1,10 @@
 ﻿@model scheduler.Models.Event
 
+@{
+    ViewData["Title"] = Model.Title;
+}
 
-<h2>Событие @Model.Title @Model.Id</h2>
+<h2>Событие @Model.Title</h2>
 
 
 <form asp-action="Info" asp-controller="Event" asp-anti-forgery="true" method="get">

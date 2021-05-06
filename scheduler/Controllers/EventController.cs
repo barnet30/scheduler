@@ -32,7 +32,14 @@ namespace scheduler.Controllers
         public IActionResult Create()
         {
             ViewData["Username"] = HttpContext.User.Identity.Name;
-            return View();
+            if (HttpContext.User.Identity.Name != null)
+            {
+                return View();
+            }
+            else
+            {
+                return RedirectToAction("Login", "Account");
+            }
         }
 
         [HttpPost]
