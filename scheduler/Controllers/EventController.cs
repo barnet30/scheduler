@@ -21,9 +21,9 @@ namespace scheduler.Controllers
          
         
         [HttpGet]
-        public IActionResult Info(int id)
+        public async Task<IActionResult> Info(int id)
         {
-            Event model = db.Events.FirstOrDefault(el => el.Id == id);
+            Event model = await db.Events.FirstOrDefaultAsync(el => el.Id == id);
             ViewData["Nick"] = db.Users.FirstOrDefault(c => c.Id == model.CreaterUserId).Nickname;
             return View(model);
         }
