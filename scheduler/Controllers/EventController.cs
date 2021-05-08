@@ -46,82 +46,73 @@ namespace scheduler.Controllers
         public async Task<IActionResult> Create(EventModel model)
         {
             ViewData["Username"] = HttpContext.User.Identity.Name;
-            if (HttpContext.User.Identity.Name != null)
+
+            // Если пользователь не авторизован
+            if (HttpContext.User.Identity.Name == null)
             {
-                if (ModelState.IsValid)
-                {
-                    User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);
-                    if (user != null)
-                    {
-                        if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
-                        {
-                            db.Events.Add(new Event { Title = model.Title, CreaterUserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
-                            await db.SaveChangesAsync();
+                return RedirectToAction("Login", "Account");
+            }
 
-                            Event newEv = await db.Events.OrderBy(i => i.Id).LastOrDefaultAsync(u => u.CreaterUserId == user.Id);
-                            db.DateEvents.Add(new DateEvent { EventId = newEv.Id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
-                            await db.SaveChangesAsync();
-
-                            return RedirectToAction("Index", "Home");
-                        }
-                        else
-                        {
-                            ModelState.AddModelError("", "Неврно заполнена дата проведения");
-                            return View();
-                        }
-
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "Неверный никнейм");
-                        return View();
-                    }
-                }
-                else
-                    ModelState.AddModelError("", "Некоректные данные");
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Некоректные данные");
                 return View();
+            }
+
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);
+            if (user == null)
+            {
+                ModelState.AddModelError("", "Неверный никнейм");
+                return View();
+            }
+
+            if (model.BeginDate >= DateTime.Now && model.EndDate >= model.BeginDate)
+            {
+                db.Events.Add(new Event { Title = model.Title, CreaterUserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                await db.SaveChangesAsync();
+
+                Event newEvent = await db.Events.OrderBy(i => i.Id).LastOrDefaultAsync(u => u.CreaterUserId == user.Id);
+                db.DateEvents.Add(new DateEvent { EventId = newEvent.Id, UserId = user.Id, BeginDate = model.BeginDate, EndDate = model.EndDate });
+                await db.SaveChangesAsync();
+
+                return RedirectToAction("Index", "Home");
             }
             else
             {
-                return RedirectToAction("Login", "Account");
+                ModelState.AddModelError("", "Неврно заполнена дата проведения");
+                return View();
             }
         }
 
         [HttpGet]
-        public IActionResult Calculate(int id)
+        public async Task<IActionResult> CalculateDates (int id)
         {
             ViewData["Username"] = HttpContext.User.Identity.Name;
-            string createrName = db.Users.FirstOrDefault(u => u.Id == db.Events.FirstOrDefault(e => e.Id == id).CreaterUserId).Nickname;
-            if (createrName == HttpContext.User.Identity.Name)
-            {
-                var bdates = (from dateevent in db.DateEvents
-                              where dateevent.EventId == id
-                              select dateevent.BeginDate).ToList();
-
-                var edates = (from dateevent in db.DateEvents
-                              where dateevent.EventId == id
-                              select dateevent.EndDate).ToList();
-
-                DateTime bdate = bdates.Max();
-                DateTime edate = edates.Min();
-
-                if (bdate >= edate)
-                {
-                    ViewBag.Message = "Нет удобного для всех времени";
-                    return View();
-                }
-                else
-                {
-                    ViewBag.Message = $"Удобное время для проведения события: {bdate.ToString("g")} - {edate.ToString("g")}";
-                    return View();
-                }
-            }
-            else
+            User creater = await db.Users.FirstOrDefaultAsync(u => u.Id == db.Events.FirstOrDefault(e => e.Id == id).CreaterUserId);
+            string createrName = creater.Nickname;
+            if (createrName != HttpContext.User.Identity.Name)
             {
                 ViewBag.Message = "Вы не являетесь создателем этого события";
                 return View();
             }
-            
+
+            var beginDates = db.DateEvents.Where(e => e.EventId == id).Select(e => e.BeginDate).ToList();
+
+            var endDates = db.DateEvents.Where(e => e.EventId == id).Select(e => e.EndDate).ToList();
+
+            DateTime beginDate = beginDates.Max();
+            DateTime endDate = endDates.Min();
+
+            if (beginDate >= endDate)
+            {
+                ViewBag.Message = "Нет удобного для всех времени";
+                return View();
+            }
+            else
+            {
+                ViewBag.Message = $"Удобное время для проведения события: {beginDate.ToString("g")} - {endDate.ToString("g")}";
+                return View();
+            }            
         }
 
     }

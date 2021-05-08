@@ -30,17 +30,20 @@ namespace scheduler.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname && u.Password == model.Password);
-                if (user != null)
-                {
-                    await Authenticate(model.Nickname); // аутентификация
-
-                    return RedirectToAction("Create", "Event");
-                }
                 ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+                return View(model);
             }
+
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname && u.Password == model.Password);
+            if (user != null)
+            {
+                await Authenticate(model.Nickname); // аутентификация
+                return RedirectToAction("Create", "Event");
+            }
+            else
+                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             return View(model);
         }
 
@@ -54,22 +57,22 @@ namespace scheduler.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);
-                if (user == null)
-                {
-                    // добавляем пользователя в бд
-                    db.Users.Add(new User { Nickname = model.Nickname, Password = model.Password });
-                    await db.SaveChangesAsync();
-
-                    await Authenticate(model.Nickname); // аутентификация
-
-                    return RedirectToAction("Create", "Event");
-                }
-                else
-                    ModelState.AddModelError("", "Некорректные логин и(или) пароль");
+                return View(model);
             }
+
+            User user = await db.Users.FirstOrDefaultAsync(u => u.Nickname == model.Nickname);
+            if (user == null)
+            {
+                // добавляем пользователя в бд
+                db.Users.Add(new User { Nickname = model.Nickname, Password = model.Password });
+                await db.SaveChangesAsync();
+                await Authenticate(model.Nickname); // аутентификация
+                return RedirectToAction("Create", "Event");
+            }
+            else
+                ModelState.AddModelError("", "Некорректные логин и(или) пароль");
             return View(model);
         }
 
